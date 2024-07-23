@@ -1,6 +1,5 @@
 let canvas, canvasContext;
-let p2 = new Car();
-let p1 = new Car();
+let p1 = new Warrior();
 
 
 function startGame() {
@@ -18,14 +17,12 @@ window.onload = function() {
   canvasContext = canvas.getContext('2d'); // this object lets one draw on or manipulate the canvas
   canvas.style.cursor = 'crosshair';
 
-  p2.init(p2CarPic, "Green Car"); 
-  p1.init(p1CarPic, "Blue Car");
+  p1.init(playerPic, "Glipnar the Warrior");
   initializeInput();
   loadImages();
 }
 
 function moveEverything() {
-  p2.move();
   p1.move();
 }
 
@@ -38,6 +35,5 @@ function drawEverything() {
   drawTrack();
 
   // draw the car
-  p2.draw();
   p1.draw();
 }

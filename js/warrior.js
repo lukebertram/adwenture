@@ -4,7 +4,7 @@ const REVERSE_POWER = 0.2;
 const TURN_RATE = 0.03;
 const MIN_TURN_SPEED = 0.4;
 
-class Car {
+class Warrior {
   constructor() {
     // const startIndex = trackGrid.findIndex(val => val == TRACK.PLAYER_START);
     // trackGrid[startIndex] = TRACK.ROAD; // replace start position with road in the tilemap
@@ -18,17 +18,17 @@ class Car {
     this.angle = -0.5 * Math.PI;
     
     this.keyHeld = {
-      gas: false,
-      reverse: false,
-      turnLeft: false,
-      turnRight: false,
+      north: false,
+      south: false,
+      west: false,
+      east: false,
     };
 
     this.controlKey = {
-      gas: undefined,
-      reverse: undefined,
-      left: undefined,
-      right: undefined,
+      north: undefined,
+      south: undefined,
+      west: undefined,
+      east: undefined,
     };
 
     this.graphic = undefined;
@@ -38,15 +38,15 @@ class Car {
   }
 
   setupControls(forwardKey, reverseKey, leftKey, rightKey) {
-    this.controlKey.gas = forwardKey;
-    this.controlKey.reverse = reverseKey;
-    this.controlKey.left = leftKey;
-    this.controlKey.right = rightKey;
+    this.controlKey.north = forwardKey;
+    this.controlKey.south = reverseKey;
+    this.controlKey.west = leftKey;
+    this.controlKey.east = rightKey;
   }
 
-  init(graphic, carName) {
+  init(graphic, warriorName) {
     this.graphic = graphic;
-    this.name = carName;
+    this.name = warriorName;
     this.reset();
   }
 
@@ -56,14 +56,14 @@ class Car {
 
     if (this.homeX == undefined) {
       let startingPointFound = false;
-      trackGrid.forEach((trackTile, index) => {
+      worldGrid.forEach((trackTile, index) => {
         if (trackTile == TRACK.PLAYER_START && !startingPointFound) {
           startingPointFound = true;
-          const tileRow = Math.floor(index/TRACK_COLS);
-          const tileCol = index % TRACK_COLS;
-          this.homeX = tileCol * TRACK_WIDTH + 0.5 * TRACK_WIDTH;
-          this.homeY = tileRow * TRACK_HEIGHT + 0.5 * TRACK_HEIGHT;
-          trackGrid[index] = TRACK.ROAD;
+          const tileRow = Math.floor(index/WORLD_TILE_COLS);
+          const tileCol = index % WORLD_TILE_COLS;
+          this.homeX = tileCol * WORLD_TILE_WIDTH + 0.5 * WORLD_TILE_WIDTH;
+          this.homeY = tileRow * WORLD_TILE_HEIGHT + 0.5 * WORLD_TILE_HEIGHT;
+          worldGrid[index] = TRACK.ROAD;
         }
       });
     }
@@ -78,18 +78,18 @@ class Car {
 
   move() {
     if (Math.abs(this.speed) >= MIN_TURN_SPEED) {
-      if (this.keyHeld.turnLeft) {
+      if (this.keyHeld.west) {
         this.angle -= TURN_RATE * Math.PI;
       }
-      if (this.keyHeld.turnRight) {
+      if (this.keyHeld.east) {
         this.angle += TURN_RATE * Math.PI;
       }
     }
 
-    if (this.keyHeld.gas) {
+    if (this.keyHeld.north) {
       this.speed += DRIVE_POWER;
     }
-    if (this.keyHeld.reverse) {
+    if (this.keyHeld.south) {
       this.speed -= REVERSE_POWER;
     }
 
@@ -102,8 +102,7 @@ class Car {
       this.y = nextY;
     } else if (nextTrackType == TRACK.GOAL) {
       document.getElementById("debugText").innerHTML = `${this.name || "Someone"} wins!`
-      p2.reset();
-      p1.reset();
+      this.reset();
     } else {
       this.speed *= -0.5;
     }

@@ -1,5 +1,4 @@
-let p1CarPic = document.createElement("img");
-let p2CarPic = document.createElement("img");
+let playerPic = document.createElement("img");
 
 let trackPics = [];
 let trackPicRoad = document.createElement("img");
@@ -29,8 +28,7 @@ function countLoadedImageAndLaunchIfReady() {
 
 function loadImages() {
   const images = [
-    {varName: p1CarPic, fileName: 'player1.png'}, 
-    {varName: p2CarPic, fileName: 'player2.png'},
+    {varName: playerPic, fileName: 'player1.png'}, 
 
     {
       trackType: TRACK.ROAD,
