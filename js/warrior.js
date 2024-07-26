@@ -1,8 +1,4 @@
-const GROUNDSPEED_DECAY_MULT = 0.94;
-const DRIVE_POWER = 0.5;
-const REVERSE_POWER = 0.2;
-const TURN_RATE = 0.03;
-const MIN_TURN_SPEED = 0.4;
+const PLAYER_MOVE_SPEED = 3.0;
 
 class Warrior {
   constructor() {
@@ -15,7 +11,6 @@ class Warrior {
     // this.x = tileCol * TRACK_WIDTH + 0.5 * TRACK_WIDTH;
     // this.y = tileRow * TRACK_HEIGHT + 0.5 * TRACK_HEIGHT;
     this.speed = 0;
-    this.angle = -0.5 * Math.PI;
     
     this.keyHeld = {
       north: false,
@@ -52,18 +47,18 @@ class Warrior {
 
   reset() {
     this.speed = 0;
-    this.angle = -0.5 * Math.PI;
+    this.keysOwned = 0;
 
     if (this.homeX == undefined) {
       let startingPointFound = false;
-      worldGrid.forEach((trackTile, index) => {
-        if (trackTile == TRACK.PLAYER_START && !startingPointFound) {
+      roomGrid.forEach((trackTile, index) => {
+        if (trackTile == TILE.PLAYER_START && !startingPointFound) {
           startingPointFound = true;
-          const tileRow = Math.floor(index/WORLD_TILE_COLS);
-          const tileCol = index % WORLD_TILE_COLS;
-          this.homeX = tileCol * WORLD_TILE_WIDTH + 0.5 * WORLD_TILE_WIDTH;
-          this.homeY = tileRow * WORLD_TILE_HEIGHT + 0.5 * WORLD_TILE_HEIGHT;
-          worldGrid[index] = TRACK.ROAD;
+          const tileRow = Math.floor(index/ROOM_COLS);
+          const tileCol = index % ROOM_COLS;
+          this.homeX = tileCol * TILE_WIDTH + 0.5 * TILE_WIDTH;
+          this.homeY = tileRow * TILE_HEIGHT + 0.5 * TILE_HEIGHT;
+          roomGrid[index] = TILE.GROUND;
         }
       });
     }
@@ -73,40 +68,64 @@ class Warrior {
   }
 
   draw() {
-      drawBmp(canvasContext, this.graphic, this.x, this.y, this.angle)
+      drawBmp(canvasContext, this.graphic, this.x, this.y, 0.0) // 0.0 means never rotate this graphic
   }
 
   move() {
-    if (Math.abs(this.speed) >= MIN_TURN_SPEED) {
-      if (this.keyHeld.west) {
-        this.angle -= TURN_RATE * Math.PI;
-      }
-      if (this.keyHeld.east) {
-        this.angle += TURN_RATE * Math.PI;
-      }
-    }
+    let nextX = this.x;
+    let nextY = this.y;
 
     if (this.keyHeld.north) {
-      this.speed += DRIVE_POWER;
+      nextY -= PLAYER_MOVE_SPEED;
     }
     if (this.keyHeld.south) {
-      this.speed -= REVERSE_POWER;
+      nextY += PLAYER_MOVE_SPEED;
+    }
+    if (this.keyHeld.east) {
+      nextX += PLAYER_MOVE_SPEED;
+    }
+    if (this.keyHeld.west) {
+      nextX -= PLAYER_MOVE_SPEED;
     }
 
-    const nextX = this.x + Math.cos(this.angle) * this.speed;
-    const nextY = this.y + Math.sin(this.angle) * this.speed;
+    const nextTileIndex = getTileIndexAtPixelCoord(nextX, nextY);
+    let nextTileType = TILE.WALL;
 
-    const nextTrackType = getTrackAtPixelCoord(nextX, nextY);
-    if (nextTrackType == TRACK.ROAD) {
-      this.x = nextX;
-      this.y = nextY;
-    } else if (nextTrackType == TRACK.GOAL) {
-      document.getElementById("debugText").innerHTML = `${this.name || "Someone"} wins!`
-      this.reset();
-    } else {
-      this.speed *= -0.5;
+    if (nextTileIndex != undefined) {
+      nextTileType = roomGrid[nextTileIndex];
     }
 
-    this.speed *= GROUNDSPEED_DECAY_MULT;
+    switch (nextTileType) {
+      case TILE.GROUND:
+        // let the player complete their movement
+        this.x = nextX;
+        this.y = nextY;
+        break;
+    
+      case TILE.GOAL:
+        // set win message, reset round
+        document.getElementById("debugText").innerHTML = `${this.name} is victorious!`;
+        this.reset();
+        break;
+    
+      case TILE.DOOR:
+        // check for key. If available, decrease key count & remove door
+        if (this.keysOwned > 0) {
+          this.keysOwned -= 1;
+          roomGrid[nextTileIndex] = TILE.GROUND;
+        }
+        break;
+    
+      case TILE.KEY:
+        // remove key tile & increase key count
+        roomGrid[nextTileIndex] = TILE.GROUND;
+        this.keysOwned += 1;
+        break;
+    
+      case TILE.WALL:
+      default:
+        // any other tile type number was found... do nothing for now.
+        break;
+    }
   }
 }

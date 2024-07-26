@@ -1,17 +1,17 @@
 let playerPic = document.createElement("img");
 
-let trackPics = [];
-let trackPicRoad = document.createElement("img");
-let trackPicWall = document.createElement("img");
-let trackPicTree = document.createElement("img");
-let trackPicFlag = document.createElement("img");
-let trackPicGoal = document.createElement("img");
+let tilePics = [];
+let tileGround = document.createElement("img");
+let tileWall = document.createElement("img");
+let tileGoal = document.createElement("img");
+let tileKey = document.createElement("img");
+let tileDoor = document.createElement("img");
 
 let numberOfImagesToLoad;
 
-function loadImageForTrackCode(trackCode, fileName) {
-  trackPics[trackCode] = document.createElement("img");
-  beginLoadingImage(trackPics[trackCode], fileName);
+function loadImageForTileCode(tileCode, fileName) {
+  tilePics[tileCode] = document.createElement("img");
+  beginLoadingImage(tilePics[tileCode], fileName);
 }
 
 function beginLoadingImage(imgVar, fileName) {
@@ -28,35 +28,35 @@ function countLoadedImageAndLaunchIfReady() {
 
 function loadImages() {
   const images = [
-    {varName: playerPic, fileName: 'player1.png'}, 
+    {varName: playerPic, fileName: 'warrior.png'}, 
 
     {
-      trackType: TRACK.ROAD,
-      fileName: 'track_road.png'
+      tileType: TILE.GROUND,
+      fileName: 'world_ground.png'
     },
     {
-      trackType: TRACK.WALL,
-      fileName: 'track_wall.png'
+      tileType: TILE.WALL,
+      fileName: 'world_wall.png'
     },
     {
-      trackType: TRACK.TREE,
-      fileName: 'track_tree.png'
+      tileType: TILE.KEY,
+      fileName: 'world_key.png'
     },
     {
-      trackType: TRACK.FLAG,
-      fileName: 'track_flag.png'
+      tileType: TILE.DOOR,
+      fileName: 'world_door.png'
     },
     {
-      trackType: TRACK.GOAL,
-      fileName: 'track_goal.png'
+      tileType: TILE.GOAL,
+      fileName: 'world_goal.png'
     },
   ];
 
   numberOfImagesToLoad = images.length;
 
   images.forEach((image) => {
-    if(image.trackType != undefined){
-      loadImageForTrackCode(image.trackType, image.fileName);
+    if(image.tileType != undefined){
+      loadImageForTileCode(image.tileType, image.fileName);
     } else {
       beginLoadingImage(image.varName, image.fileName)
     }

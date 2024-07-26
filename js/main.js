@@ -29,10 +29,10 @@ function moveEverything() {
 function drawEverything() {
   canvasContext.textAlign = 'center';
   // draw the background
-  // colorRect(canvasContext, 0, 0, canvas.width, canvas.height, 'black');
+  colorRect(canvasContext, 0, 0, canvas.width, canvas.height, 'black');
 
-  // draw the track
-  drawTrack();
+  // draw the world
+  drawRoom();
 
   // draw the car
   p1.draw();
